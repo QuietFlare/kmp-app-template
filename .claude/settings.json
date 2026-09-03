@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew :shared:jvmTest*)",
+      "Bash(./gradlew :androidApp:testDebugUnitTest*)",
+      "Bash(./gradlew :androidApp:lintDebug*)",
+      "Bash(./gradlew :shared:linkDebugFrameworkIosSimulatorArm64*)",
+      "Bash(python3 design/tokens.py*)",
+      "Bash(python3 tools/render_icon.py*)",
+      "Bash(xcodegen generate*)",
+      "Bash(xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator*)"
+    ]
+  }
+}

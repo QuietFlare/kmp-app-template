@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Export for App Store Connect and upload straight to TestFlight. -->
+    <key>method</key>
+    <string>app-store-connect</string>
+    <key>destination</key>
+    <string>upload</string>
+    <!-- Your Apple Team ID. Must match DEVELOPMENT_TEAM in iosApp/project.yml.
+         Not a secret; it ships inside every distributed app. -->
+    <key>teamID</key>
+    <string>REPLACE_WITH_TEAM_ID</string>
+    <!-- Cloud signing: the App Store Connect API key mints the distribution
+         certificate and profile on the runner, so CI stores no signing assets. -->
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <key>uploadSymbols</key>
+    <true/>
+    <!-- App Store Connect handles the TestFlight compliance prompt; encryption is
+         declared exempt via ITSAppUsesNonExemptEncryption in iosApp/project.yml. -->
+    <key>manageAppVersionAndBuildNumber</key>
+    <true/>
+</dict>
+</plist>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GENERATED FROM design/tokens.json. DO NOT EDIT.
+     Only what the platform needs before Compose starts; the palette lives in Theme.kt. -->
+<resources>
+    <color name="background">#FBF3E4</color>
+</resources>

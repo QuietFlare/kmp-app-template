@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- No tracking (no cross-app/website tracking, no ad SDKs). -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <!-- Collected data types: empty for a local-only app. When a backend or accounts land,
+         declare every type here and mirror it in App Store Connect's App Privacy. -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+    <!-- Required-reason APIs. Add an entry for every new one used (file timestamps, active
+         keyboards, system boot time, etc.); otherwise submission rejects the build (ITMS-91053). -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <!-- @AppStorage = UserDefaults. CA92.1: accessed only to read/write this
+                 app's own settings. -->
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

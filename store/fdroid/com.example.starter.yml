@@ -1,0 +1,33 @@
+Categories:
+  - Sports & Health
+License: MIT
+AuthorName: REPLACE_WITH_AUTHOR
+WebSite: https://example.com/starter
+SourceCode: https://github.com/OWNER/REPO
+IssueTracker: https://github.com/OWNER/REPO/issues
+
+AutoName: Starter
+
+RepoType: git
+Repo: https://github.com/OWNER/REPO.git
+Binaries: 
+  https://github.com/OWNER/REPO/releases/download/android-v%v/starter-%v-release.apk
+
+Builds:
+  - versionName: '0.1.0'
+    versionCode: 1
+    commit: REPLACE_WITH_THE_TAGGED_COMMIT_SHA
+    subdir: androidApp
+    gradle:
+      - yes
+
+# The SHA-256 of the signing certificate on the APK attached to the GitHub release:
+#   apksigner verify --print-certs starter-0.1.0-release.apk
+AllowedAPKSigningKeys: REPLACE_WITH_THE_UPLOAD_CERT_SHA256
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^android-v
+UpdateCheckData: androidApp/build.gradle.kts|appVersionCode = (\d+)|.|appVersionName
+  = "([^"]+)"
+CurrentVersion: '0.1.0'
+CurrentVersionCode: 1

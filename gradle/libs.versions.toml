@@ -1,0 +1,37 @@
+# Every version is declared here; both modules read from this file.
+# Pinned together (bump as a set):
+#   Gradle wrapper 8.11.1  <->  AGP 8.10.1   (8.10 needs exactly 8.11.1; 8.11+ needs 8.13)
+#   Kotlin 2.2.0           <->  kotlin.plugin.compose 2.2.0 (always the same version)
+#   compileSdk 36 is AGP 8.10's maximum; a newer SDK needs a newer wrapper first.
+
+[versions]
+agp = "8.10.1"
+kotlin = "2.2.0"
+kotlinx-datetime = "0.6.1"
+kotlinx-serialization = "1.7.3"
+compose-bom = "2025.06.00"
+activity-compose = "1.10.1"
+core-ktx = "1.16.0"
+lifecycle = "2.9.1"
+junit = "4.13.2"
+
+[libraries]
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

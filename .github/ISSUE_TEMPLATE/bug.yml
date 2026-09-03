@@ -1,0 +1,28 @@
+name: Bug report
+description: Something did not behave as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and version
+      placeholder: iOS 17.5 on iPhone 15 / Android 15 on Pixel 8 / app version
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Installed from
+      options: [App Store, TestFlight, Google Play, F-Droid, built from source]

@@ -1,0 +1,37 @@
+# Gradle / Kotlin
+.gradle/
+.kotlin/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+
+# Xcode / iOS
+xcuserdata/
+*.xcuserstate
+DerivedData/
+iosApp/iosApp.xcodeproj/project.xcworkspace/
+.DS_Store
+
+# Secrets — the client holds no secrets; never commit real ones
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+*.iml
+.claude/settings.local.json
+
+# Generated / scratch
+.build/
+tools/__pycache__/
+design/__pycache__/
+store/video/raw-*.mov
+store/video/.work/
+
+# Android release signing — NEVER commit these (public repo).
+# Bare name so it is ignored wherever it is put, not just the one expected path.
+keystore.properties
+androidApp/keystore/
+*.jks
+*.keystore

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English-only by decision: UI copy lives in the composable that shows it, as in the iOS
+     app. Only resources the system reads (the launcher label) belong here. -->
+<resources>
+    <string name="app_name">Starter</string>
+</resources>

@@ -1,0 +1,43 @@
+name: Release
+
+# Ships to TestFlight via github.com/QuietFlare/ci-workflows (MIT). Triggers: a `v*`
+# tag or a manual dispatch, never a branch push:  git tag v1.0.0 && git push --tags
+# Re-runs both test suites on the tagged commit, then archives and uploads.
+# Secrets: ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_P8, from an App Store Connect API key
+# (Users and Access > Integrations; the .p8 file downloads exactly once).
+# Export options: .github/ExportOptions.plist (the pipeline default path).
+# Bump CURRENT_PROJECT_VERSION in iosApp/project.yml per upload; App Store Connect
+# rejects a duplicate build number. Edit the yml, the .xcodeproj is generated.
+# No wall-clock assertions in iOS tests: runners are 3-5x slower than local Apple
+# silicon, and a failing one forces `run-tests: false` here.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    uses: QuietFlare/ci-workflows/.github/workflows/release-pipeline.yml@v1
+    with:
+      project: iosApp/iosApp.xcodeproj
+      scheme: iosApp
+      gradle-tasks: ':shared:jvmTest'
+      only-testing: iosAppTests
+      # The Xcode pre-build script runs Gradle, so both the test job and the
+      # archive job need JDK 17 on the runner.
+      java-version: '17'
+      # Same as the CI gate: the iPhone 17 Pro runtime ships with Xcode 26, and
+      # the pipeline's test default does not have it.
+      test-xcode-version: '26'
+      destination: 'platform=iOS Simulator,name=iPhone 17 Pro'
+      runner: 'macos-26'
+      # release-xcode-version stays at its default ('latest-stable'). Apple raises
+      # the minimum SDK for App Store builds from time to time, and a pin here
+      # would start failing uploads on that day.
+    secrets:
+      asc-key-id: ${{ secrets.ASC_KEY_ID }}
+      asc-issuer-id: ${{ secrets.ASC_ISSUER_ID }}
+      asc-key-p8: ${{ secrets.ASC_KEY_P8 }}

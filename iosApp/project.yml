@@ -1,0 +1,119 @@
+name: iosApp
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    # Fallback JDK for the KMP pre-build script when the environment supplies
+    # none (Xcode GUI builds inherit no shell profile). A JAVA_HOME exported
+    # by CI wins; see the script below.
+    JAVA_HOME_FOR_KMP: /Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+    # Must stay NO (XcodeGen presets default it to YES). The pre-build script runs
+    # Gradle, which reads ~/.gradle and writes shared/build and the framework, all
+    # outside the sandbox; `embedAndSignAppleFrameworkForXcode` then fails with
+    # "User Script Sandboxing Enabled".
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    # Signing. Set your Team ID here, not in Xcode's UI: the .xcodeproj is
+    # generated, so `xcodegen generate` drops a team picked there. A Team ID is
+    # not a secret. Simulator builds and CI tests work without it.
+    # DEVELOPMENT_TEAM: ABCDE12345
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  # Target and scheme are named `iosApp` because the CI workflows (.github/workflows/*.yml)
+  # pass `scheme: iosApp`. The bundle id comes from PRODUCT_BUNDLE_IDENTIFIER below;
+  # left implicit, XcodeGen derives it from the target name (`<prefix>.iosApp`).
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+    info:
+      path: iosApp/Info.plist
+      properties:
+        CFBundleDisplayName: Starter
+        # Must reference the build settings. With an explicit Info.plist, XcodeGen
+        # otherwise writes literal 1.0 / build 1, which ignore MARKETING_VERSION,
+        # and App Store Connect rejects the upload (ASC 90062).
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # A storyboard, not the UILaunchScreen dictionary: its UIImageName renders
+        # nothing on device and gives no control over the mark's size or position.
+        UILaunchStoryboardName: LaunchScreen
+        # Encryption export compliance: asserts only standard/exempt crypto
+        # (HTTPS + standard AES). Confirm this exemption before submission.
+        ITSAppUsesNonExemptEncryption: false
+        # Add usage strings here as capabilities arrive, e.g.
+        # NSFaceIDUsageDescription: Starter uses Face ID to keep your data private on this device.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.starter
+        # Explicit so the About screen and App Store Connect read the same numbers.
+        # Bump MARKETING_VERSION per release, CURRENT_PROJECT_VERSION per upload.
+        MARKETING_VERSION: "0.1.0"
+        # Build numbers are consumed permanently: once a MARKETING_VERSION +
+        # CURRENT_PROJECT_VERSION pair has processed, App Store Connect never accepts
+        # it again, even after the build expires. Bump for every upload.
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # KMP framework produced by the pre-build script below:
+        FRAMEWORK_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+        OTHER_LDFLAGS:
+          - $(inherited)
+          - -framework
+          - Shared
+    preBuildScripts:
+      - name: "Build KMP Shared framework"
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          cd "$SRCROOT/.."
+          # Resolve a JDK 17 without a hard-coded machine path:
+          #   1. an inherited JAVA_HOME (CI runners set this)
+          #   2. java_home -v 17 (any local JDK 17)
+          #   3. JAVA_HOME_FOR_KMP from the build settings (Xcode GUI builds)
+          if [ -z "${JAVA_HOME:-}" ]; then
+            JAVA_HOME="$(/usr/libexec/java_home -v 17 2>/dev/null || echo "$JAVA_HOME_FOR_KMP")"
+          fi
+          if [ ! -x "$JAVA_HOME/bin/java" ]; then
+            echo "error: no JDK 17 found. Install Temurin 17 or set JAVA_HOME." >&2
+            exit 1
+          fi
+          export JAVA_HOME
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode
+
+  # Tests for the app's own logic plus what jvmTest cannot reach: the Keychain KeyVault
+  # actual and the Swift↔Kotlin bridge. Shared-core tests: `./gradlew :shared:jvmTest`.
+  iosAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: iosAppTests
+    dependencies:
+      - target: iosApp
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.starter.tests
+
+schemes:
+  iosApp:
+    build:
+      targets:
+        iosApp: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - iosAppTests
+
+# A store-asset capture rig (a `bundle.ui-testing` target) needs its own `Capture` scheme,
+# not `iosApp`, so `xcodebuild test -scheme iosApp` runs only the unit tests.

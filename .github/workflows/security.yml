@@ -1,0 +1,35 @@
+name: Security
+
+# Security and compliance via github.com/QuietFlare/ci-workflows (MIT).
+# Per PR, on Ubuntu: gitleaks full-history secret scan, dependency review, and the
+# App Store preflight (privacy manifest present, ITSAppUsesNonExemptEncryption
+# declared, no committed signing material).
+# CodeQL needs a full macOS build, so it runs weekly and on demand, not per PR.
+# Dependency review and CodeQL uploads to the Security tab are free on a public repo.
+on:
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write   # CodeQL results upload to the Security tab
+
+jobs:
+  security:
+    uses: QuietFlare/ci-workflows/.github/workflows/security-pipeline.yml@v1
+    with:
+      # Needs the repo's Dependency graph enabled (Settings > Code security >
+      # Dependency graph); free on a public repo. Set false until it is.
+      dependency-review: true
+      privacy-manifest: iosApp/iosApp/PrivacyInfo.xcprivacy
+      info-plist: iosApp/iosApp/Info.plist
+      # CodeQL only on the weekly schedule and manual runs, not per PR.
+      codeql: ${{ github.event_name != 'pull_request' }}
+      project: iosApp/iosApp.xcodeproj
+      scheme: iosApp
+      xcode-version: '26'
+      destination: 'platform=iOS Simulator,name=iPhone 17 Pro'
+      runner: 'macos-26'
+      java-version: '17'   # the Xcode pre-build step runs Gradle

@@ -1,0 +1,22 @@
+# Bump PRs for the two ecosystems this repo depends on. Each bump runs the full CI
+# gate, so an upgrade is validated before it lands.
+#
+# Gradle bumps are grouped so one PR moves a coherent set, and the AGP/Gradle-wrapper
+# interlock in gradle/libs.versions.toml is reviewed as one change.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      kotlin:
+        patterns: ["org.jetbrains.kotlin*", "org.jetbrains.kotlinx*"]
+      android:
+        patterns: ["com.android.*", "androidx.*"]

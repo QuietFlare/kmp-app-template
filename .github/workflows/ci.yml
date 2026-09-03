@@ -1,0 +1,53 @@
+name: CI
+
+# PR gate. Calls the reusable workflows in github.com/QuietFlare/ci-workflows (MIT):
+# KMP core tests plus Android tests and lint on Ubuntu, iOS tests on a simulator, then
+# an AI review. Every input is documented in the workflow's own `workflow_call` block.
+#
+# Runs on push-to-main too. macOS minutes are free on a public repo and bill at 10x on
+# a private one; on a private repo drop the `push:` trigger.
+#
+# The AI review needs the GEMINI_API_KEY repo secret and skips without a PR context.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write   # AI review comments
+  issues: write          # AI review comments
+
+jobs:
+  pr:
+    uses: QuietFlare/ci-workflows/.github/workflows/pr-pipeline.yml@v1
+    with:
+      # Everything JVM-testable runs here at a tenth of the macOS cost: the shared
+      # core, the Android unit tests, and Android lint (it catches minSdk crashes).
+      gradle-tasks: ':shared:jvmTest :androidApp:testDebugUnitTest :androidApp:lintDebug'
+      # iOS covers what jvmTest cannot: the Keychain KeyVault actual and the
+      # Swift/Kotlin bridge. The Xcode pre-build step runs Gradle, so it needs a JDK.
+      project: iosApp/iosApp.xcodeproj
+      scheme: iosApp
+      java-version: '17'
+      xcode-version: '26'
+      destination: 'platform=iOS Simulator,name=iPhone 17 Pro'
+      runner: 'macos-26'
+      ai-review: true
+      review-instructions: >-
+        Starter is a Kotlin Multiplatform app: a shared core (pure domain
+        logic, no UI or platform APIs) plus a SwiftUI app and a Jetpack Compose
+        app. Focus on correctness bugs, state pitfalls, and the Swift↔Kotlin
+        bridge (Kotlin Int arrives as Int32; Kotlin default arguments do NOT
+        cross, so every argument must be passed; dates cross as ISO yyyy-MM-dd
+        strings). UI copy and colours belong in the native layer, never the
+        core; colours come from design/tokens.json, never literals. Flag any
+        insight or claim shown without a data guardrail. Be brief where the
+        code is fine.
+    secrets:
+      gemini-api-key: ${{ secrets.GEMINI_API_KEY }}

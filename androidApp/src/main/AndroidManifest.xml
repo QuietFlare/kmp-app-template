@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      No permissions by default. Add each with a comment saying what needs it, and re-read
+      COMPLIANCE.md: the Play Data safety answers assume no INTERNET permission. Before a
+      release check the MERGED manifest, since libraries can inject permissions:
+        grep uses-permission androidApp/build/intermediates/merged_manifest/release/*/AndroidManifest.xml
+    -->
+
+    <application
+        android:name=".StarterApp"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/Theme.App"
+        android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
+        tools:ignore="UnusedAttribute"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false">
+
+        <!-- singleTop: a notification tap while running goes to onNewIntent instead of
+             stacking a second activity. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.App"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density|fontScale"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
